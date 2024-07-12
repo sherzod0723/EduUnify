@@ -2,12 +2,9 @@ from pathlib import Path
 from django.conf import settings
 import pdfkit
 import os
-
-from django.contrib.sessions.backends import file
-
 from .jazzmin import JAZZMIN_SETTINGS
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-# BASE_DIR = Path(file).resolve().parent.parent
 SECRET_KEY = "django-insecure-za6smg=w*ks0f*7xc&*x!l)_+^am=-!lytf65bt*z(*8wpr03w"
 DEBUG = True
 ALLOWED_HOSTS = ['edu-unify.uz', '127.0.0.1']
@@ -107,7 +104,6 @@ AUTH_USER_MODEL = 'users.User'
 LOGOUT_REDIRECT_URL = 'index'
 LOGIN_REDIRECT_URL = 'index'
 
-PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = {

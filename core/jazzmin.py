@@ -1,7 +1,7 @@
 JAZZMIN_SETTINGS = {
-    'site_header': "CYBERCORE",
-    'site_brand': "CYBERCORE",
-    'site_logo': "/assets/images/mrit.jpg",
+    'site_header': "EDU UNIFY",
+    'site_brand': "EDU UNIFY",
+    'site_logo': "/assets/images/edu-unif.jpg",
     "site_logo_classes": "img-circle",
     'copyright': "CYBERCORE",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
@@ -47,7 +47,7 @@ JAZZMIN_SETTINGS = {
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
 
         # external url that opens in a new window (Permissions can be added)
-        {"name": "Support", "url": "http://crm.mritacademy.uz/"},
+        {"name": "Support", "url": "http://edu-unify.uz/"},
 
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
@@ -62,7 +62,7 @@ JAZZMIN_SETTINGS = {
 
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
-        {"name": "Support", "url": "http://crm.mritacademy.uz/"},
+        {"name": "Support", "url": "http://edu-unify.uz/"},
         {"model": "auth.user"}
     ],
 
