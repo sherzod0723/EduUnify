@@ -8,6 +8,14 @@ SECRET_KEY = "django-insecure-za6smg=w*ks0f*7xc&*x!l)_+^am=-!lytf65bt*z(*8wpr03w
 DEBUG = True
 ALLOWED_HOSTS = ['edu-unify.uz', '127.0.0.1']
 
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = True  # Use this if your site is HTTPS
+CSRF_COOKIE_HTTPONLY = False  # This should generally be False to allow JavaScript access
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_ALLOW_ALL = True
