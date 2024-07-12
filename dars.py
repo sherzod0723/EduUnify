@@ -12,18 +12,34 @@
 #     print("Ovoz berishga haqli emas")
 
 
-a = int(input("Enter a number: "))
-b = input("qaysi amalni baajarish kerak tanlang, +, -, *, /: ")
-c = int(input("Enter a number: "))
+# a = int(input("Enter a number: "))
+# b = input("qaysi amalni baajarish kerak tanlang, +, -, *, /: ")
+# c = int(input("Enter a number: "))
+#
+# if b == "+":
+#     print(a + c)
+# elif b == "-":
+#     print(a - c)
+# elif b == "*":
+#     print(a * c)
+# else:
+#     print(a / c)
 
-if b == "+":
-    print(a + c)
-elif b == "-":
-    print(a - c)
-elif b == "*":
-    print(a * c)
+
+# age = int(input("Enter your age: "))
+# if age <=12 or age >=60:
+#    print("chegirma bor")
+# else:
+#     print("chegirma yoq")
+#
+
+a = -5
+
+if a > 0:
+    print(a+1)
 else:
-    print(a / c)
+    print(a)
+
 
 
 
