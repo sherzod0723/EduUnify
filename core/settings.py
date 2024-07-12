@@ -5,7 +5,7 @@ import os
 from .jazzmin import JAZZMIN_SETTINGS
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-za6smg=w*ks0f*7xc&*x!l)_+^am=-!lytf65bt*z(*8wpr03w"
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['edu-unify.uz', '127.0.0.1']
 
 CORS_ALLOW_CREDENTIALS = True
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
+    'course.middleware.Custom404Middleware'
 ]
 
 ROOT_URLCONF = "core.urls"
