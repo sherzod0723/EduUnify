@@ -6,8 +6,8 @@ import os
 from django.contrib.sessions.backends import file
 
 from .jazzmin import JAZZMIN_SETTINGS
-
-BASE_DIR = Path(file).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(file).resolve().parent.parent
 SECRET_KEY = "django-insecure-za6smg=w*ks0f*7xc&*x!l)_+^am=-!lytf65bt*z(*8wpr03w"
 DEBUG = True
 ALLOWED_HOSTS = ['edu-unify.uz', '127.0.0.1']
