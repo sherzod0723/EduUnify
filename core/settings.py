@@ -2,6 +2,9 @@ from pathlib import Path
 from django.conf import settings
 import pdfkit
 import os
+
+from django.contrib.sessions.backends import file
+
 from .jazzmin import JAZZMIN_SETTINGS
 
 BASE_DIR = Path(file).resolve().parent.parent
