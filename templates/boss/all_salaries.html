@@ -17,33 +17,47 @@
 </div>
 
 <div class="row">
-      <div class="col-12">
-            <div  class=" card  col-12">
-                  <div class="container" >
-                        <br>
-                  <form method="post"  >{% csrf_token %}
-                          
-                        <div class="row" >
-                          <div class="col-5" >
-                            <label for="example-date-input" class="form-label">Boshlanish</label>
-                            <input class="form-control" name="start" type="date" value="{{start}}" id="example-date-input">
-                          </div>
-                          <div class="col-5" >
-                            <label for="example-date-input" class="form-label">Tugash</label>
-                            <input class="form-control" name="end" type="date" value="{{end}}" id="example-date-input">
-                          </div>
-                          <div class="col-2" ><button style='margin-top:27px' type="submit" class="btn btn-primary" >Yuborish</button></div>
-
-                        </div>
-                  
-                     
-                 
-                      
-                    </form>
-                    <br>
-                  </div>
-                  
+  <div class="card col-12">
+    <div class="container">
+        <br>
+        <form method="post" onsubmit="return validateForm()">{% csrf_token %}
+            <div class="row">
+                <div class="col-5">
+                    <label for="start-date-input" class="form-label">Boshlanish</label>
+                    <input class="form-control" name="start" type="date" value="{{start}}" id="start-date-input">
+                </div>
+                <div class="col-5">
+                    <label for="end-date-input" class="form-label">Tugash</label>
+                    <input class="form-control" name="end" type="date" value="{{end}}" id="end-date-input">
+                </div>
+                <div class="col-2">
+                    <button style="margin-top:27px" type="submit" class="btn btn-primary">Yuborish</button>
+                </div>
             </div>
+        </form>
+        <br>
+    </div>
+</div>
+
+<script>
+function validateForm() {
+    const startDate = document.getElementById('start-date-input').value;
+    const endDate = document.getElementById('end-date-input').value;
+
+    if (!startDate && !endDate) {
+        alert("Iltimos Boshlanish va Tugashni kiriting.");
+        return false;
+    } else if (!startDate) {
+        alert("Iltimos Boshlanishni kiriting.");
+        return false;
+    } else if (!endDate) {
+        alert("Iltimos Tugashni kiriting.");
+        return false;
+    }
+    return true;
+}
+</script>
+
           <div class="card">
               <div class="card-header">
                   <h4 class="card-title">Barcha to'lovlar</h4>

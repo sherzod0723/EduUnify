@@ -319,3 +319,41 @@ def download_certificate(request, student_id, course_id):
     response = HttpResponse(pdf_buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{student.full_name}_{course.name}.pdf"'
     return response
+
+
+
+from django.shortcuts import render
+from django.views.generic import ListView
+from .models import Course
+
+class CourseListView(ListView):
+    model = Course
+    template_name = 'boss/all_courses.html'
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        ended = self.kwargs.get('ended', None)
+        if ended is not None:
+            queryset = queryset.filter(is_ended=ended)
+        return queryset
+
+
+
+from django.shortcuts import render
+from django.views.generic import ListView
+from .models import ReceiptionAdmin
+
+class ReceiptionAdminListView(ListView):
+    model = Receiption
+    template_name = 'reception_list.html'
+    context_object_name = 'receptions'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status = self.kwargs.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+

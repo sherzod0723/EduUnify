@@ -81,13 +81,9 @@ Kurs ochish
             <label for="id_room" class="requiredField">Xona</label>
             <input type="number" name="room" class="form-control" required>
         </div>
-        <div id="div_course_time" class="form-group">
-            <label for="id_time" class="requiredField">Vaqti</label>
-            <select name="time" class="form-select" required>
-                {% for value, label in times %}
-            <option value="{{ value }}">{{ label }}</option>
-        {% endfor %}
-            </select>
+       <div id="div_id_time" class="form-group">
+            <label for="id_time" class="requiredField">Time</label>
+            <input type="text" name="time" class="form-control" required>
         </div>
 
         <br>

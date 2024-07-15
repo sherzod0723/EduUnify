@@ -27,7 +27,7 @@ admin.site.register(Student, StudentAdmin)
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     filter_horizontal = ['students']  # Use filter_horizontal for many-to-many fields
-    search_fields = ['name']  # Enable search on the course title
+    search_fields = ['name', 'students__name', 'students__email']  # Enable search on the course title
 
 
 

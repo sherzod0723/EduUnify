@@ -6,6 +6,7 @@ from django.utils import timezone
 import random
 from .validators import validate_grade, validate_phone_number
 from django.db.models import Sum
+
 # Create your models here.
 times = (
     ('1', '7.30:9.30'),
@@ -35,7 +36,6 @@ class Student(models.Model):
         negative_wallet_sum = Student.objects.filter(wallet__lt=0).aggregate(Sum('wallet'))['wallet__sum'] or 0
         positive_wallet_sum = Student.objects.filter(wallet__gt=0).aggregate(Sum('wallet'))['wallet__sum'] or 0
         return negative_wallet_sum, positive_wallet_sum
-
 
 class Course_for_news(models.Model):
     name = models.CharField(max_length=200, default="kurs nomini kiriting")
@@ -90,7 +90,7 @@ class Course(models.Model):
     title = models.TextField(null=True, blank=True)
     price = models.PositiveBigIntegerField()
     students = models.ManyToManyField(Student)
-    time = models.CharField(max_length=150, choices=times)
+    time = models.CharField(max_length=150)
     days = models.CharField(max_length=150, choices=days)
     room = models.PositiveBigIntegerField()
     start_date = models.DateField(default=date.today(), blank=True, null=True)
