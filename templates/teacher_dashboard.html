@@ -69,32 +69,45 @@
                 <div class="row align-items-center">
                     <div class="col-12">
                         <span class="text-muted mb-3 lh-1 d-block text-truncate">Oraliqni o'zgartirish</span>
-                        <form method="post"  >{% csrf_token %}
-                          
-                            <div class="row" >
-                              <div class="col-5" >
-                                <label for="example-date-input" class="form-label">Boshlanish</label>
-                                <input class="form-control" name="start" type="date" value="{{start}}" id="example-date-input">
-                              </div>
-                              <div class="col-5" >
-                                <label for="example-date-input" class="form-label">Tugash</label>
-                                <input class="form-control" name="end" type="date" value="{{end}}" id="example-date-input">
-                              </div>
-                              <div class="col-2" ><button style='margin-top:27px' type="submit" class="btn btn-primary" >Yuborish</button></div>
-
+                        <form method="post" onsubmit="return validateForm()">{% csrf_token %}
+                            <div class="row">
+                                <div class="col-5">
+                                    <label for="start-date-input" class="form-label">Boshlanish</label>
+                                    <input class="form-control" name="start" type="date" value="{{start}}" id="start-date-input">
+                                </div>
+                                <div class="col-5">
+                                    <label for="end-date-input" class="form-label">Tugash</label>
+                                    <input class="form-control" name="end" type="date" value="{{end}}" id="end-date-input">
+                                </div>
+                                <div class="col-2">
+                                    <button style='margin-top:27px' type="submit" class="btn btn-primary">Yuborish</button>
+                                </div>
                             </div>
-                         
-                     
-                          
                         </form>
-                        
                     </div>
-                   
                 </div>
-               
             </div><!-- end card body -->
         </div><!-- end card -->
-    </div><!-- end col -->    
+    </div>
+    
+    <script>
+    function validateForm() {
+        const startDate = document.getElementById('start-date-input').value;
+        const endDate = document.getElementById('end-date-input').value;
+    
+        if (!startDate && !endDate) {
+            alert("Iltimos Boshlanish va Tugashni kiriting.");
+            return false;
+        } else if (!startDate) {
+            alert("Iltimos Boshlanishni kiriting.");
+            return false;
+        } else if (!endDate) {
+            alert("Iltimos Tugashni kiriting.");
+            return false;
+        }
+        return true;
+    }
+    </script>    
 </div><!-- end row-->
 <div class="row">
   <div class="col-12">

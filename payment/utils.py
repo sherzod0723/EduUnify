@@ -60,4 +60,4 @@ def calculate_total_discounted_amount():
     total_discount = 0
     for discount in Discounted_students.objects.all():
         total_discount += discount.discount_summ
-    return total_discount
+    return float(total_discount)

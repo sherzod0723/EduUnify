@@ -567,7 +567,6 @@ def create_coures_new(request):
         #     ('1', 'Dush-Chor-Jum-shanba'),
         #     ('2', 'Sesh-Pay-Shan')
         # ],
-        'times': Course._meta.get_field('time').choices,
         'days': Course._meta.get_field('days').choices
     }
     return render(request, 'boss/create_course.html', context)
@@ -673,6 +672,7 @@ def teachers(request):
         return redirect('index')
 
 
+
 @login_required
 def give_salary(request, teacher_id):
     teacher = User.objects.get(id=teacher_id, is_teacher=True)
@@ -690,7 +690,21 @@ def give_salary(request, teacher_id):
         messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
         return redirect('index')
 
+from django.shortcuts import render
+from django.views.generic import ListView
+from users.models import User
 
+class TeacherListView(ListView):
+    model = User
+    template_name = 'boss/all_teachers.html'
+    context_object_name = 'teachers'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(is_teacher=True)
+        active = self.kwargs.get('active', None)
+        if active is not None:
+            queryset = queryset.filter(is_active=active)
+        return queryset
 
 
 
@@ -744,7 +758,7 @@ def salaries(request):
 def courses(request):
     teachers = User.objects.filter(is_teacher=True)
     if request.user.is_staff == True:
-        courses = Course.objects.filter(is_ended=False)
+        courses = Course.objects.all()
         return render(request, 'boss/all_courses.html', {'courses': courses})
     else:
         messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
@@ -755,7 +769,7 @@ class EditCourse(UpdateView, LoginRequiredMixin, SuccessMessageMixin):
     model = Course
     template_name = 'boss/edit_course.html'
     fields = ('name', 'teacher', 'title', 'price', 'students', 'days', 'room', 'end_date', 'is_ended')
-    success_url = '/'
+    success_url = '/staff/courses'
     success_message = "Amal  muvaffaqiyali bajarildi."
 
 
@@ -780,6 +794,11 @@ def update_status(request, receiption_id):
     messages.success(request, f"{receiption.full_name} - o'quvchining  {receiption.course } kursiga  statusi yangilandi.")
     return redirect('reception-dashboard')
 
+def toggle_status(request, pk):
+    reception = get_object_or_404(Receiption, pk=pk)
+    reception.status = not reception.status
+    reception.save()
+    return redirect(request.META.get('HTTP_REFERER', 'all-reception'))
 
 
 def edit_receiption(request, receiption_id):
@@ -796,6 +815,11 @@ def edit_receiption(request, receiption_id):
 
     return render(request,'edit_receiption.html',{'form':form})
 
+class ReceiptionUpdateView(UpdateView):
+    model = Receiption
+    fields = ['full_name', 'phone_number', 'course', 'status']
+    template_name = 'edit_reception.html'
+    success_url = reverse_lazy('all-reception')
 # def course_details(request, course_id):
 #     course = get_object_or_404(Course, id=course_id)
 #     teacher = course.teacher  # Kursga tegishli ustozni olish
