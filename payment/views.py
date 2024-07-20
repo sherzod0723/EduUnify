@@ -1,43 +1,83 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .utils import incomes_in_one_day, incomes_between_two_dates, calculate_total_discounted_amount
+from .utils import incomes_in_one_day, incomes_between_two_dates, calculate_total_discounted_amount, calculate_fresh_income
 from datetime import date, timedelta
 from django.contrib import messages
 from course.models import *
 from django.db.models import Count, Q, Sum
 from users.models import User
+from .models import *
+from django.http import JsonResponse
+from .forms import *
+from django.views.decorators.csrf import csrf_exempt
+import logging
 
 
+def get_four_day_intervals(start_date, end_date):
+      intervals = []
+      current_date = start_date
+      while current_date <= end_date:
+            next_date = current_date + timedelta(days=4)
+            intervals.append((current_date, min(next_date, end_date)))
+            current_date = next_date + timedelta(days=1)
+      return intervals
+
+
+def count_registrations_in_interval(interval):
+      start_date, end_date = interval
+      return Receiption.objects.filter(created_at__range=(start_date, end_date)).count()
+
+
+def monthly_receipt_view(request):
+
+
+      context = {
+
+      }
+
+      return render(request, 'your_template.html', context)
 # Create your views here.
-@login_required 
+@login_required
 def income(request):
       user = request.user
       if user.is_staff == True:
             negative_wallet_sum, positive_wallet_sum = Student.get_wallet_sums()
-            negative_wallet_students = Student.objects.filter(wallet__lt=0)
+            negative_wallet_students = Student.objects.filter(wallet__lt=1)
             positive_wallet_students = Student.objects.filter(wallet__gt=0)
             total_discount  = calculate_total_discounted_amount
             total_students = Student.objects.all().count()
             all_courses_count = Course.objects.count()
             ended_courses_count = Course.objects.filter(is_ended=True).count()
             ongoing_courses_count = Course.objects.filter(is_ended=False).count()
-
-            receiption_admin_true_count = ReceiptionAdmin.objects.filter(status=True).count()
-            receiption_admin_false_count = ReceiptionAdmin.objects.filter(status=False).count()
-
+            fresh_income = calculate_fresh_income()
+            receiption_admin_true_count = Receiption.objects.filter(status=True).count()
+            receiption_admin_false_count = Receiption.objects.filter(status=False).count()
+            receiption_admin_count = Receiption.objects.all().count()
             registration_data_count = RegistrationData.objects.count()
             teacher_count = User.objects.filter(is_teacher=True).count()
+            teacher_count_active = User.objects.filter(is_teacher=True, is_active=True).count()
+            teacher_count_inactive = User.objects.filter(is_teacher=True,is_active = False).count()
             negative_wallet_count = negative_wallet_students.count()
             positive_wallet_count = positive_wallet_students.count()
             if total_students > 0:
-                  negative_wallet_percentage = (negative_wallet_count / total_students) * 100
-                  positive_wallet_percentage = (positive_wallet_count / total_students) * 100
+                  negative_wallet_percentage = int((negative_wallet_count / total_students) * 100)
+                  positive_wallet_percentage = int((positive_wallet_count / total_students) * 100)
             else:
                   negative_wallet_percentage = 0
                   positive_wallet_percentage = 0
             start = date.today()-timedelta(days=30)
             end=date.today()
             incomes_between_dates = incomes_between_two_dates( start, end)
+
+            today = date.today()
+            start_of_month = today.replace(day=1)
+            end_of_month = (start_of_month + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+
+            intervals = get_four_day_intervals(start_of_month, end_of_month)
+            registration_counts = [count_registrations_in_interval(interval) for interval in intervals]
+            total_edu_sum = PayToCourse.objects.aggregate(total=Sum('transfer_summ'))['total'] or 0
+
+
             if request.method == 'POST':
                   start = request.POST['start']
                   end = request.POST['end']
@@ -59,12 +99,58 @@ def income(request):
                   'ongoing_courses_count': ongoing_courses_count,
                   'receiption_admin_true_count': receiption_admin_true_count,
                   'receiption_admin_false_count': receiption_admin_false_count,
+                  'receiption_admin_count': receiption_admin_count ,
                   'registration_data_count': registration_data_count,
                   'teacher_count': teacher_count,
                   'negative_wallet_percentage': negative_wallet_percentage,
                   'positive_wallet_percentage': positive_wallet_percentage,
+                  'negative_wallet_count' : negative_wallet_count,
+                  'positive_wallet_count' : positive_wallet_count,
+                  'registration_counts': registration_counts,
+                  'intervals': intervals,
+                  'teacher_active' : teacher_count_active,
+                  'teacher_inactive' : teacher_count_inactive,
+                  'half_total_sum': fresh_income,
+
             }
-            return render(request, "income.html", context)
+            return render(request, "index.html", context)
       else  :
             messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
             return redirect('index')
+
+
+def expenses_view(request):
+    if request.method == 'POST':
+        form = ExpensesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('expenses_view')
+    else:
+        form = ExpensesForm()
+
+    expenses = Expenses.objects.all()
+    context = {
+        'expenses': expenses,
+        'form': form
+    }
+    return render(request, 'expenses.html', context)
+
+
+def dif_students_view(request):
+    if request.method == 'POST':
+        form = DifStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dif_students_view')
+    else:
+        form = DifStudentsForm()
+
+    dif_students = Dif_students.objects.all()
+    payments = General_students_payment.objects.all()
+
+    context = {
+        'dif_students': dif_students,
+        'payments': payments,
+        'form': form
+    }
+    return render(request, 'dif_students.html', context)

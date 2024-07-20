@@ -13,16 +13,20 @@ urlpatterns = [
       path('evaluate-task/', evaluate_task, name='evaluate_task'),
       path('edit_grade/<int:grade_id>/', edit_grade, name='edit_grade'),
       path('update-status/<int:receiption_id>/', update_status, name='update-status'),
+      path('receiption/update-status/<int:pk>/', toggle_status, name='update-status1'),
       path('attendance-detail/<int:id>', attendance_detail, name='attendance-detail'),
       path('course-detail/<int:id>', course_detail, name='course-detail'),
       path('attendance/<int:id>', attendance, name='attendance'),
       path('edit_receiption/<int:receiption_id>/', edit_receiption, name='edit_receiption'),
+      path('receiption/edit/<int:pk>/', ReceiptionUpdateView.as_view(), name='edit_receiption1'),
       #Post viewlar
       #path('make-payment', make_payment, name='make-payment'),
       path('make-payment/', make_payment, name='make-payment'),
       path('print_chek/<int:id>/', print_chek, name='print_chek'),
       path('create-student', create_student, name='create-student'),
-
+      path('receiption/', ReceiptionAdminListView.as_view(), name='all-reception'),
+      path('receiption/active/', ReceiptionAdminListView.as_view(), {'status': True}, name='active-reception'),
+      path('receiption/inactive/', ReceiptionAdminListView.as_view(), {'status': False}, name='inactive-reception'),
 
       path('add-student-to-course', add_student_to_course, name='add-student-to-course'),
       path('add_discount/', add_discount, name='add_discount'),
@@ -31,10 +35,13 @@ urlpatterns = [
       #Boss views
       path('staff/create-user', CreateUser.as_view(), name='create-user'),
       path('staff/edit-user/<int:pk>/', CreateUser.as_view(), name='create-user'),
-
+      path('staff/courses/ended/', CourseListView.as_view(), {'ended': True}, name='ended-courses'),
+      path('staff/courses/ongoing/', CourseListView.as_view(), {'ended': False}, name='ongoing-courses'),
       #path('staff/create-user', create_user_view, name='create-user'),
       path('staff/payments', payments, name='payments'),
       path('staff/teachers', teachers, name='teachers'),
+      path('staff/teachers/active/', TeacherListView.as_view(), {'active': True}, name='active-teachers'),
+      path('staff/teachers/inactive/', TeacherListView.as_view(), {'active': False}, name='inactive-teachers'),
       path('staff/students', students, name='students'),
       path('staff/salaries', salaries, name='salaries'),
       path('staff/give-salary/<int:teacher_id>', give_salary, name='give-salary'),
@@ -54,6 +61,8 @@ urlpatterns = [
       path('search/', search_certificates, name='search_certificates'),
       path('courses/download/<int:student_id>/<int:course_id>/', download_certificate, name='download_certificate'),
       path('ajax/search/', ajax_search_certificates, name='ajax_search_certificates'),
+      path('expenses/', expenses_view, name='expenses_view'),
+      path('dif_students/', dif_students_view, name='dif_students_view'),
 ]
 
 
