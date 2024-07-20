@@ -7,6 +7,7 @@ from course.models import *
 from django.db.models import Count, Q, Sum
 from users.models import User
 from .models import *
+
 from django.http import JsonResponse
 from .forms import *
 from django.views.decorators.csrf import csrf_exempt
@@ -21,6 +22,17 @@ def get_four_day_intervals(start_date, end_date):
             intervals.append((current_date, min(next_date, end_date)))
             current_date = next_date + timedelta(days=1)
       return intervals
+
+
+def get_four_day_intervals(start_date, end_date):
+      intervals = []
+      current_date = start_date
+      while current_date <= end_date:
+            next_date = current_date + timedelta(days=4)
+            intervals.append((current_date, min(next_date, end_date)))
+            current_date = next_date + timedelta(days=1)
+      return intervals
+
 
 
 def count_registrations_in_interval(interval):
@@ -49,7 +61,9 @@ def income(request):
             all_courses_count = Course.objects.count()
             ended_courses_count = Course.objects.filter(is_ended=True).count()
             ongoing_courses_count = Course.objects.filter(is_ended=False).count()
+
             fresh_income = calculate_fresh_income()
+
             receiption_admin_true_count = Receiption.objects.filter(status=True).count()
             receiption_admin_false_count = Receiption.objects.filter(status=False).count()
             receiption_admin_count = Receiption.objects.all().count()
@@ -76,6 +90,8 @@ def income(request):
             intervals = get_four_day_intervals(start_of_month, end_of_month)
             registration_counts = [count_registrations_in_interval(interval) for interval in intervals]
             total_edu_sum = PayToCourse.objects.aggregate(total=Sum('transfer_summ'))['total'] or 0
+
+
 
 
             if request.method == 'POST':
@@ -110,6 +126,7 @@ def income(request):
                   'intervals': intervals,
                   'teacher_active' : teacher_count_active,
                   'teacher_inactive' : teacher_count_inactive,
+
                   'half_total_sum': fresh_income,
 
             }

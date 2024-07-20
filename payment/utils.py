@@ -109,3 +109,4 @@ def calculate_fresh_income():
     return float(fresh_income)
 
 
+
