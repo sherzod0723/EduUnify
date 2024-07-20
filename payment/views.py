@@ -1,12 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .utils import incomes_in_one_day, incomes_between_two_dates, calculate_total_discounted_amount
+from .utils import incomes_in_one_day, incomes_between_two_dates, calculate_total_discounted_amount, calculate_fresh_income
 from datetime import date, timedelta
 from django.contrib import messages
 from course.models import *
 from django.db.models import Count, Q, Sum
 from users.models import User
 from .models import *
+
+from django.http import JsonResponse
+from .forms import *
+from django.views.decorators.csrf import csrf_exempt
+import logging
+
 
 def get_four_day_intervals(start_date, end_date):
       intervals = []
@@ -16,6 +22,17 @@ def get_four_day_intervals(start_date, end_date):
             intervals.append((current_date, min(next_date, end_date)))
             current_date = next_date + timedelta(days=1)
       return intervals
+
+
+def get_four_day_intervals(start_date, end_date):
+      intervals = []
+      current_date = start_date
+      while current_date <= end_date:
+            next_date = current_date + timedelta(days=4)
+            intervals.append((current_date, min(next_date, end_date)))
+            current_date = next_date + timedelta(days=1)
+      return intervals
+
 
 
 def count_registrations_in_interval(interval):
@@ -45,6 +62,8 @@ def income(request):
             ended_courses_count = Course.objects.filter(is_ended=True).count()
             ongoing_courses_count = Course.objects.filter(is_ended=False).count()
 
+            fresh_income = calculate_fresh_income()
+
             receiption_admin_true_count = Receiption.objects.filter(status=True).count()
             receiption_admin_false_count = Receiption.objects.filter(status=False).count()
             receiption_admin_count = Receiption.objects.all().count()
@@ -71,8 +90,9 @@ def income(request):
             intervals = get_four_day_intervals(start_of_month, end_of_month)
             registration_counts = [count_registrations_in_interval(interval) for interval in intervals]
             total_edu_sum = PayToCourse.objects.aggregate(total=Sum('transfer_summ'))['total'] or 0
-            half_total_sum = total_edu_sum / 2
-            edu_sum = float(half_total_sum) - float(calculate_total_discounted_amount())
+
+
+
 
             if request.method == 'POST':
                   start = request.POST['start']
@@ -106,9 +126,48 @@ def income(request):
                   'intervals': intervals,
                   'teacher_active' : teacher_count_active,
                   'teacher_inactive' : teacher_count_inactive,
-                  'half_total_sum': edu_sum,
+
+                  'half_total_sum': fresh_income,
+
             }
             return render(request, "index.html", context)
       else  :
             messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
             return redirect('index')
+
+
+def expenses_view(request):
+    if request.method == 'POST':
+        form = ExpensesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('expenses_view')
+    else:
+        form = ExpensesForm()
+
+    expenses = Expenses.objects.all()
+    context = {
+        'expenses': expenses,
+        'form': form
+    }
+    return render(request, 'expenses.html', context)
+
+
+def dif_students_view(request):
+    if request.method == 'POST':
+        form = DifStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dif_students_view')
+    else:
+        form = DifStudentsForm()
+
+    dif_students = Dif_students.objects.all()
+    payments = General_students_payment.objects.all()
+
+    context = {
+        'dif_students': dif_students,
+        'payments': payments,
+        'form': form
+    }
+    return render(request, 'dif_students.html', context)

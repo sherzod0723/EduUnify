@@ -52,3 +52,17 @@ admin.site.register(PayToCourse, PayToCourseAdmin)
 admin.site.register(AddCashToWallet)
 admin.site.register(GiveSalary)
 admin.site.register(Discounted_students)
+
+class DifStudentsInline(admin.TabularInline):
+    model = Dif_students
+    extra = 1
+
+class GeneralStudentsPaymentAdmin(admin.ModelAdmin):
+    inlines = [DifStudentsInline]
+
+admin.site.register(Dif_students)
+admin.site.register(General_students_payment, GeneralStudentsPaymentAdmin)
+
+admin.site.register(Expenses)
+
+

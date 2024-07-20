@@ -61,6 +61,8 @@ urlpatterns = [
       path('search/', search_certificates, name='search_certificates'),
       path('courses/download/<int:student_id>/<int:course_id>/', download_certificate, name='download_certificate'),
       path('ajax/search/', ajax_search_certificates, name='ajax_search_certificates'),
+      path('expenses/', expenses_view, name='expenses_view'),
+      path('dif_students/', dif_students_view, name='dif_students_view'),
 ]
 
 

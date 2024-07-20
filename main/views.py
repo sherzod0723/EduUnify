@@ -271,13 +271,19 @@ def attendance(request, id):
 
             # Update the wallet and create payment record if needed
             if status in ['sababsiz', 'kelgan']:
-                student.wallet -= attendancegroup.course.price
+                try:
+                    dif_student = Dif_students.objects.get(student=student, course=attendancegroup.course)
+                    transfer_summ = dif_student.dif_summ
+                except Dif_students.DoesNotExist:
+                    transfer_summ = attendancegroup.course.price
+
+                student.wallet -= transfer_summ
                 student.save()
-                if attendancegroup.course.price != 0:
+                if transfer_summ != 0:
                     PayToCourse.objects.create(
                         student=student,
                         course=attendancegroup.course,
-                        transfer_summ=attendancegroup.course.price,
+                        transfer_summ=transfer_summ,
                     )
 
         total_number_of_students = students.count()
