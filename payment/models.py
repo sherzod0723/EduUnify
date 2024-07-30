@@ -214,3 +214,28 @@ class Discounted_students(models.Model):
 
     def __str__(self):
         return f"{self.discount_summ} is transferred to {self.student}'s wallet on {self.date} at {self.time} by {self.recepient}"
+
+class General_students_payment(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.course.name
+
+class Dif_students(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    dif_summ = models.PositiveBigIntegerField()
+    teacher_money  = models.PositiveBigIntegerField()
+    general_payment = models.ForeignKey(General_students_payment, on_delete=models.CASCADE, related_name='dif_students')
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.course.name} - {self.dif_summ} - {self.teacher_money}"
+
+
+class Expenses(models.Model):
+    name = models.CharField(max_length=120)
+    about = models.TextField()
+    summ = models.PositiveBigIntegerField()
+
+    def __str__(self):
+        return self.name

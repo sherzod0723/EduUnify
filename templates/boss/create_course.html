@@ -8,9 +8,12 @@ Kurs ochish
 
 <div class="container"><br>
     <h5>Kurs ochish</h5>
+   
     {% if request.user.is_staff %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yaratish</button>
+        <a href="/" class="btn btn-danger">Ortga qaytish</a>
 
         <div id="div_id_name" class="form-group">
             <label for="id_name" class="requiredField">Nomi</label>
@@ -36,35 +39,7 @@ Kurs ochish
             <input type="number" name="price" class="form-control" required>
         </div>
 
-        <div id="div_id_students" class="form-group">
-            <label for="id_students" class="requiredField">O'quvchilar</label>
-            <div>
-                <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th scope="col">Tanlash</th>
-                            <th scope="col">Full Name</th>
-                            <th scope="col">Telefon raqami</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in students %}
-                        <tr>
-                            <td>
-                                <input class="form-check-input" type="checkbox" name="students" value="{{ student.id }}" id="student_{{ student.id }}">
-                            </td>
-                            <td>
-                                <label class="form-check-label" for="student_{{ student.id }}">
-                                    {{ student.full_name }}
-                                </label>
-                            </td>
-                            <td>{{ student.phone_number }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        
 
 
 
@@ -81,21 +56,75 @@ Kurs ochish
             <label for="id_room" class="requiredField">Xona</label>
             <input type="number" name="room" class="form-control" required>
         </div>
-        <div id="div_course_time" class="form-group">
-            <label for="id_time" class="requiredField">Vaqti</label>
-            <select name="time" class="form-select" required>
-                {% for value, label in times %}
-            <option value="{{ value }}">{{ label }}</option>
-        {% endfor %}
-            </select>
+       <div id="div_id_time" class="form-group">
+            <label for="id_time" class="requiredField">Time</label>
+            <input type="text" name="time" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="student_search">O'quvchilarni izlash:</label>
+            <input type="text" id="student_search" class="form-control" placeholder="O'quvchilarni qidiring...">
+        </div>
+       
+        <div id="student_table" class="table-responsive">
+            <table id="datatable-bordered" class="table table-bordered dt-responsive nowrap">
+                <thead>
+                    <tr>
+
+                        <th scope="col" width="3%">Tanlash</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Telefon raqami</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                   
+
+                    <tr>
+                        <td>
+                            <input class="form-check-input custom-checkbox"  type="checkbox" name="students" value="{{ student.id }}" id="student_{{ student.id }}" {% if student in form.instance.students.all %}checked{% endif %}>
+                        </td>
+
+                        <td>
+                            <label class="form-check-label" for="student_{{ student.id }}">
+                                {{ student.full_name }}
+                            </label>
+                        </td>
+
+
+                        <td>{{ student.phone_number }}</td>
+                        
+                    </tr>
+                   
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <br>
-        <button type="submit" class="btn btn-primary">Yaratish</button>
-        <a href="/" class="btn btn-danger">Ortga qaytish</a>
+     
     </form>
     {% endif %}
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputField = document.getElementById('student_search');
+        const tableBody = document.querySelector('#datatable-bordered tbody');  // Updated selector
+        const rows = tableBody.getElementsByTagName('tr');
 
+        inputField.addEventListener('input', function() {
+            const searchText = inputField.value.trim().toLowerCase();
+
+            for (let row of rows) {
+                const fullName = row.cells[1].textContent.toLowerCase();
+                if (fullName.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
 
 {% endblock content %}

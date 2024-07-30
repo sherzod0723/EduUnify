@@ -89,3 +89,23 @@ class DiscountedStudentsForm(forms.ModelForm):
     class Meta:
         model = Discounted_students
         fields = ['student', 'discount_summ', 'date']
+
+
+
+from django import forms
+from .models import Course, Student
+
+from django import forms
+from .models import Course, Student
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['name', 'teacher', 'title', 'price', 'students', 'days', 'room', 'end_date', 'is_ended']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:  # Check if we're editing an existing course
+            # Set the initial value of the 'students' field
+            self.fields['students'].initial = self.instance.students.all()
+

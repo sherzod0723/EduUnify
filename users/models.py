@@ -22,3 +22,5 @@ class User(AbstractUser):
             else:
                   return str( self.first_name ) + " "+str(self.last_name)
 
+
+

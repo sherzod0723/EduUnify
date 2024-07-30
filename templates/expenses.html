@@ -1,0 +1,32 @@
+{% extends "boss/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Expenses</h2>
+    <form id="expenses-form" method="post" action="{% url 'expenses_view' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Expense</button>
+    </form>
+    <br>
+    <h3>All Expenses</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>About</th>
+                <th>Summ</th>
+            </tr>
+        </thead>
+        <tbody id="expenses-table">
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.name }}</td>
+                <td>{{ expense.about }}</td>
+                <td>{{ expense.summ }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

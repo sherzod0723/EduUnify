@@ -5,7 +5,7 @@
 <head>
         
         <meta charset="utf-8" />
-        <title>Edu Unify</title>
+        <title>EDU UNIFY</title>
         <link rel="icon" type="image/x-icon" href="{% static 'assets/images/edu-unif.jpg' %}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
@@ -46,7 +46,7 @@
                                     <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24"> <span class="logo-txt">Edu Unify</span>
+                                    <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24"> <span class="logo-txt">EDU UNIFY</span>
                                 </span>
                             </a>
 
@@ -55,7 +55,7 @@
                                     <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24"> <span class="logo-txt">Edu Unify</span>
+                                    <img src="{% static 'assets/images/edu-unif.jpg' %}" alt="" height="24"> <span class="logo-txt">EDU UNIFY</span>
                                 </span>
                             </a>
                         </div>
@@ -143,7 +143,7 @@
                     <div id="sidebar-menu">
                         <!-- Left Menu Start -->
                         <ul class="metismenu list-unstyled" id="side-menu">
-                            <li class="menu-title" data-key="t-menu">Menu</li>
+                            <li class="menu-title" data-key="t-menu">Menu </li>
 
                             <li>
                                 <a href="{% url 'income' %}">
@@ -174,6 +174,11 @@
                                             <span data-key="t-chat">Kurslar</span>
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="{% url 'all-reception' %}">
+                                            <span data-key="t-chat">Qabuldagilar</span>
+                                        </a>
+                                    </li>
                                     
                                 </ul>
                             </li>
@@ -187,8 +192,8 @@
                                     <li><a href="{% url 'payments' %}" data-key="t-login">To'lovlar</a></li>
                                     <li><a href="{% url 'salaries' %}" data-key="t-register">Ish haqilar</a></li>
                                     <li><a href="{% url 'view_discount' %}" data-key="t-register">Bonuslar</a></li>
-
-
+                                    <li><a href="{% url 'dif_students_view' %}" data-key="t-register">O`quvchilar tulovi</a></li>
+                                    <li><a href="{% url 'expenses_view' %}" data-key="t-register">Xarajatlar</a></li>
                                 </ul>
                             </li>
 
@@ -299,7 +304,7 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-sm-6">
-                                <script>document.write(new Date().getFullYear())</script> © <strong style="color: #D68D20"> CYBERCORE</strong>>
+                               <script>document.write(new Date().getFullYear())</script> © <strong style="color: #D68D20"> CYBERCORE</strong>>
                             </div>
                             <div class="col-sm-6">
                                 
@@ -500,7 +505,7 @@
         <script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
         <script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
         <script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
-
+    
         <!-- <script src="{% static '' %}"></script> -->
     </body>
 </html>
