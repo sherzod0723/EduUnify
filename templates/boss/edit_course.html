@@ -1,18 +1,86 @@
 {% extends 'boss/base.html' %}
-{% load crispy_forms_tags %}
+{% load static %}
 {% block title %}
-Kursni tahrirlash
+{% load crispy_forms_tags %}
+Kurs ochish
 {% endblock title %}
 {% block content %}
-      <div class="container"><br>
-            {% if request.user.is_staff == True %}
-            <h5>Kursni tahrirlash </h5>
-            <form  method="post">{% csrf_token %}
-                  {{ form|crispy }}
-                  <br>
-                  <button type="submit" class="btn btn-primary" > Tahrirlash </button>
-                  <a href="{% url 'index' %}"  class="btn btn-danger"> Ortga qaytish </a>
-            </form>
-            {% endif %}
-            </div>
+
+<div class="container"><br>
+    <h5>Kurs ochish</h5>
+    
+    {% if request.user.is_staff %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yaratish</button>
+        <a href="/" class="btn btn-danger">Ortga qaytish</a>
+        
+        {{ form.non_field_errors }}
+        {{ form.name|as_crispy_field }}
+        {{ form.teacher|as_crispy_field }}
+        {{ form.title|as_crispy_field }}
+        {{ form.price|as_crispy_field }}
+        {{ form.days|as_crispy_field }}
+        {{ form.room|as_crispy_field }}
+        
+        <div class="form-group">
+            <label for="student_search">O'quvchilarni izlash:</label>
+            <input type="text" id="student_search" class="form-control" placeholder="O'quvchilarni qidiring...">
+        </div>
+        
+        <div id="student_table" class="table-responsive">
+            <table id="datatable-bordered" class="table table-bordered dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th scope="col">Tanlash</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Telefon raqami</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            <input class="form-check-input" type="checkbox" name="students" value="{{ student.id }}" id="student_{{ student.id }}"
+                            {% if student.id in selected_student_ids %} checked {% endif %}>
+                        </td>
+                        <td>
+                            <label class="form-check-label" for="student_{{ student.id }}">
+                                {{ student.full_name }}
+                            </label>
+                        </td>
+                        <td>{{ student.phone_number }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% comment %} <button type="submit" class="btn btn-primary">Yaratish</button> {% endcomment %}
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    // JavaScript code to filter students table based on input
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputField = document.getElementById('student_search');
+        const tableBody = document.querySelector('#datatable-bordered tbody');
+        const rows = tableBody.getElementsByTagName('tr');
+
+        inputField.addEventListener('input', function() {
+            const searchText = inputField.value.trim().toLowerCase();
+
+            for (let row of rows) {
+                const fullName = row.cells[1].textContent.toLowerCase();
+                if (fullName.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+
 {% endblock content %}

@@ -72,7 +72,6 @@ def income_of_teacher_between_dates(request, start, end):
             transfer_amount = i.transfer_summ / 2  # Or any default logic you have for non-Dif_students cases
 
         income += transfer_amount
-
     return {'income': income, 'pay_to_courses': pay_to_courses}
 
 def calculate_total_discounted_amount():
@@ -107,6 +106,5 @@ def calculate_fresh_income():
     fresh_income = total_income - total_discounted_amount - total_expenses
 
     return float(fresh_income)
-
 
 

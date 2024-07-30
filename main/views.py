@@ -771,14 +771,36 @@ def courses(request):
         return redirect('index')
 
 
-class EditCourse(UpdateView, LoginRequiredMixin, SuccessMessageMixin):
+# class EditCourse(UpdateView, LoginRequiredMixin, SuccessMessageMixin):
+#     model = Course
+#     template_name = 'boss/edit_course.html'
+#     fields = ('name', 'teacher', 'title', 'price', 'students', 'days', 'room', 'end_date', 'is_ended')
+#     success_url = '/staff/courses'
+#     success_message = "Amal  muvaffaqiyali bajarildi."
+    
+
+
+class EditCourse(SuccessMessageMixin,LoginRequiredMixin,UpdateView):
     model = Course
+    form_class = CourseForm
     template_name = 'boss/edit_course.html'
-    fields = ('name', 'teacher', 'title', 'price', 'students', 'days', 'room', 'end_date', 'is_ended')
-    success_url = '/staff/courses'
-    success_message = "Amal  muvaffaqiyali bajarildi."
+    success_url = reverse_lazy('courses')
+    success_message = "Amal muvaffaqiyali bajarildi."
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the list of student IDs associated with the course
+        selected_student_ids = self.object.students.values_list('id', flat=True)
+        context['selected_student_ids'] = selected_student_ids
+        context['students'] = Student.objects.all()
+        return context
 
+    def form_valid(self, form):
+        # Get selected students from the form
+        selected_students = self.request.POST.getlist('students')
+        form.instance.students.set(selected_students)  # Update students field
+        return super().form_valid(form)
 
+    
 
 class NewCourse(CreateView, LoginRequiredMixin, SuccessMessageMixin):
     model = Course
