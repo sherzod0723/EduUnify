@@ -786,7 +786,6 @@ class EditCourse(SuccessMessageMixin,LoginRequiredMixin,UpdateView):
     template_name = 'boss/edit_course.html'
     success_url = reverse_lazy('courses')
     success_message = "Amal muvaffaqiyali bajarildi."
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Get the list of student IDs associated with the course

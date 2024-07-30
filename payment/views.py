@@ -13,6 +13,12 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 
 
+from django.http import JsonResponse
+from .forms import *
+from django.views.decorators.csrf import csrf_exempt
+import logging
+
+
 def get_four_day_intervals(start_date, end_date):
       intervals = []
       current_date = start_date
