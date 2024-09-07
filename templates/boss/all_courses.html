@@ -12,9 +12,11 @@
     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
         <button 
             type="button" 
-            class="btn btn-lg btn-secondary btn-my-4"   
+            class="btn btn-lg btn-secondary btn-my-4"
+            data-bs-toggle="modal"
+            data-bs-target="#createCourseModal"
         >
-            <a class="text-white" href="{% url 'create-course' %}">Kurs yaratish</a>
+            Kurs yaratish
         </button>
         <div class="page-title-right">
             <ol class="breadcrumb m-0">
@@ -24,6 +26,132 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="createCourseModal" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createCourseModalLabel">Kurs yaratish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm" action="{% url 'create-course' %}">
+    {% csrf_token %}
+
+        <div id="div_id_name" class="form-group">
+            <label for="id_name" class="requiredField">Nomi</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+
+        <div id="div_id_teacher" class="form-group">
+            <label for="id_teacher" class="requiredField">O'qituvchi</label>
+            <select name="teacher" class="form-select" required>
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="div_id_title" class="form-group">
+            <label for="id_title" class="requiredField">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div id="div_id_price" class="form-group">
+            <label for="id_price" class="requiredField">Narxi</label>
+            <input type="number" name="price" class="form-control" required>
+        </div>
+
+
+
+
+
+        <div id="div_id_days" class="form-group">
+            <label for="id_days" class="requiredField">Kunlar</label>
+            <select name="days" class="form-select" required>
+                {% for value, label in days %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="div_id_room" class="form-group">
+            <label for="id_room" class="requiredField">Xona</label>
+            <input type="number" name="room" class="form-control" required>
+        </div>
+       <div id="div_id_time" class="form-group">
+            <label for="id_time" class="requiredField">Time</label>
+            <input type="text" name="time" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="student_search">O'quvchilarni izlash:</label>
+            <input type="text" id="student_search" class="form-control" placeholder="O'quvchilarni qidiring...">
+        </div>
+
+        <div id="student_table" class="table-responsive">
+            <table id="datatable-bordered" class="table table-bordered dt-responsive nowrap">
+                <thead>
+                    <tr>
+
+                        <th scope="col" width="3%">Tanlash</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Telefon raqami</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+
+
+                    <tr>
+                        <td>
+                            <input class="form-check-input custom-checkbox"  type="checkbox" name="students" value="{{ student.id }}" id="student_{{ student.id }}" {% if student in form.instance.students.all %}checked{% endif %}>
+                        </td>
+
+                        <td>
+                            <label class="form-check-label" for="student_{{ student.id }}">
+                                {{ student.full_name }}
+                            </label>
+                        </td>
+
+
+                        <td>{{ student.phone_number }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+    <!-- Include other fields similarly -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+    </div>
+</form>
+          </div>
+          </div>
+          </div>
+</div>
+
+<div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCourseModalLabel">Kursni Tahrirlash</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="editCourseModalBody">
+        <!-- Modal body will be loaded here via AJAX -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <div style="margin-top: 15px;" class="card shadow col-12">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="card-title">Barcha kurslar</h4>
@@ -79,4 +207,44 @@
 </table>
 
 </div>
+
+<script>
+document.getElementById('openCreateCourseModal').addEventListener('click', function() {
+    fetch("{% url 'create-course' %}")
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('createCourseModalBody').innerHTML = html;
+        })
+        .catch(error => console.log('Error loading modal form:', error));
+});
+
+
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'createCourseForm') {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Optionally, reload the page or close the modal and update the content dynamically
+                $('#createCourseModal').modal('hide');  // Hide the modal using jQuery
+                location.reload();  // Reload the page to reflect changes
+            } else if (data.errors) {
+                const modalBody = document.getElementById('createCourseModalBody');
+                modalBody.innerHTML = data.html;  // Re-render the form with errors
+            }
+        })
+        .catch(error => console.error('Error submitting form:', error));
+    }
+});
+</script>
 {% endblock content %}

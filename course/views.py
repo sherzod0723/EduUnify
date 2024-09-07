@@ -343,11 +343,28 @@ class CourseListView(ListView):
 from django.shortcuts import render
 from django.views.generic import ListView
 from .models import ReceiptionAdmin
+from main.views import Aas, students
+
+# class ReceiptionAdminListView(ListView):
+#     form_class = Aas
+#     model = Receiption
+#     template_name = 'reception_list.html'
+#     context_object_name = 'receptions'
+#
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         status = self.kwargs.get('status', None)
+#         if status is not None:
+#             queryset = queryset.filter(status=status)
+#         return queryset
+#
+
 
 class ReceiptionAdminListView(ListView):
     model = Receiption
     template_name = 'reception_list.html'
     context_object_name = 'receptions'
+    form_class = Aas
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -355,5 +372,12 @@ class ReceiptionAdminListView(ListView):
         if status is not None:
             queryset = queryset.filter(status=status)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation to get the default context
+        context = super().get_context_data(**kwargs)
+        # Add the form to the context
+        context['form1'] = self.form_class()
+        return context
 
 
