@@ -69,7 +69,19 @@
                         {% endif %}
                     </a>
                 </td>
+
                 <td><a href="{% url 'edit_receiption1' reception.id %}">✏️</a></td>
+
+                <td><button 
+    type="button" 
+    class="btn btn-outline-success btn-my-4"
+    data-bs-toggle="modal" 
+    data-bs-target="#createCourseModal1"
+    data-reception-id="{{ reception.id }}" 
+>
+    Tahrirlash
+</button></td>
+
                 <td><button 
             type="button" 
             class="btn btn-outline-success btn-my-4"
@@ -113,12 +125,21 @@
         <h5 class="modal-title" id="createCourseModalLabel">Tahrirlash</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
      
       <div class="modal-body">
         <!-- Load the course creation form here -->
           <form method="post" id="createCourseForm1">
     {% csrf_token %}
     {{ form|crispy}}
+
+        {% for reception in receptions %}
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm1" action="{% url 'edit_receiption1' reception.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+
     
     <br>
 
@@ -129,7 +150,9 @@
     </div>
 </form>
           </div>
-  
+
+        {% endfor %}
+
           </div>
           </div>
 </div>
