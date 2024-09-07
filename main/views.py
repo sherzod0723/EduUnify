@@ -529,8 +529,12 @@ def create_student(request):
 
     return render(request, 'reception-dashboard.html', {'course_id': course_id})
 #yangi
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-def create_coures_new(request):
+@csrf_exempt
+def create_course_new(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         teacher_id = request.POST.get('teacher')
@@ -545,7 +549,7 @@ def create_coures_new(request):
         is_ended = request.POST.get('is_ended', False) == 'on'
 
         # Fetch the User instance for the teacher
-        teacher = User.objects.get(id=teacher_id)
+        teacher = get_object_or_404(User, id=teacher_id, is_teacher=True)
 
         # Create the Course instance
         course = Course.objects.create(
@@ -555,27 +559,37 @@ def create_coures_new(request):
             price=price,
             days=days,
             room=room,
-            time = time
-
+            time=time,
+            start_date=start_date,
+            end_date=end_date,
+            is_ended=is_ended
         )
+
         # Add students to the course
         students = Student.objects.filter(id__in=students_ids)
         course.students.set(students)
         course.save()
 
-        return redirect('create-course')  # Redirect to an appropriate page after saving
+        # For AJAX request, return JSON response
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': "Kurs muvaffaqiyatli yaratildi."}, status=200)
+
+        # For non-AJAX request, redirect normally
+        return redirect('courses')  # Redirect to a page listing all courses or other appropriate page
 
     # Prepare the context for GET request
     context = {
-        'users': User.objects.filter(is_teacher=True),  # Assuming a custom user model or a way to filter teachers
+        'users': User.objects.filter(is_teacher=True),
         'students': Student.objects.all(),
-        # 'days': [
-        #     ('1', 'Dush-Chor-Jum-shanba'),
-        #     ('2', 'Sesh-Pay-Shan')
-        # ],
         'days': Course._meta.get_field('days').choices
     }
-    return render(request, 'boss/create_course.html', context)
+
+    # If AJAX request, return just the form HTML
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'partials/create_course_modal.html', context)
+
+    # For normal GET request, render full page
+    return render(request, 'boss/all_courses.html', context)
 
 
 
@@ -610,6 +624,7 @@ class CreateUser(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, C
     template_name = 'boss/create_user.html'
     success_url = reverse_lazy('create-user')
     success_message = "Amal muvaffaqiyali bajarildi."
+
 
     def test_func(self):
         return self.request.user.is_staff
@@ -667,11 +682,12 @@ def payments(request):
 @login_required
 def teachers(request):
     if request.user.is_staff == True:
+        form=Aas
         teachers = User.objects.filter(is_teacher=True)
         for i in teachers:
             i.courses = Course.objects.filter(teacher=i)
 
-        return render(request, 'boss/all_teachers.html', {"teachers": teachers})
+        return render(request, 'boss/all_teachers.html', {"teachers": teachers, 'form': form})
 
     else:
         messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
@@ -719,7 +735,9 @@ class TeacherListView(ListView):
 
 @login_required
 def students(request):
+
     if request.user.is_staff == True:
+        form = Aas()
         students = Student.objects.all().order_by('-id')
         # Prepare a dictionary to hold students and their active courses
         students_with_active_courses = []
@@ -731,7 +749,8 @@ def students(request):
             })
 
         return render(request, 'boss/all_students.html', {
-            "students": students_with_active_courses
+            "students": students_with_active_courses,
+            'form': form
         })
     else:
         messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
@@ -763,9 +782,20 @@ def salaries(request):
 
 def courses(request):
     teachers = User.objects.filter(is_teacher=True)
+
+
     if request.user.is_staff == True:
         courses = Course.objects.all()
-        return render(request, 'boss/all_courses.html', {'courses': courses})
+        context = {
+            'users': User.objects.filter(is_teacher=True),
+            'students': Student.objects.all(),
+            'days': Course._meta.get_field('days').choices,
+            'courses': courses,
+
+
+        }
+
+        return render(request, 'boss/all_courses.html', context = context)
     else:
         messages.warning(request, "Siz uchun bu sahifa mavjud emas.")
         return redirect('index')
@@ -800,7 +830,39 @@ class EditCourse(SuccessMessageMixin,LoginRequiredMixin,UpdateView):
         form.instance.students.set(selected_students)  # Update students field
         return super().form_valid(form)
 
-    
+
+class EditCourse2(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
+    model = Course
+    form_class = CourseForm
+    template_name = 'partials/edit_course_modal.html'  # Form template
+    success_url = reverse_lazy('courses')
+    success_message = "Amal muvaffaqiyali bajarildi."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        selected_student_ids = self.object.students.values_list('id', flat=True)
+        context['selected_student_ids'] = selected_student_ids
+        context['students'] = Student.objects.all()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return render(request, self.template_name, context)
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'errors': form.errors, 'html': render_to_string(self.template_name, {'form': form})}, status=400)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success_url': self.success_url}, status=200)
+        return super().form_valid(form)
 
 class NewCourse(CreateView, LoginRequiredMixin, SuccessMessageMixin):
     model = Course
@@ -841,13 +903,30 @@ def edit_receiption(request, receiption_id):
     else:
         form = ReceiptionForm(instance=receiption)
 
-    return render(request,'edit_receiption.html',{'form':form})
+    return render(request,'reception_list.html',{'form':form})
 
 class ReceiptionUpdateView(UpdateView):
     model = Receiption
-    fields = ['full_name', 'phone_number', 'course', 'status']
+    #fields = ['full_name', 'phone_number', 'course', 'status']
     template_name = 'edit_reception.html'
     success_url = reverse_lazy('all-reception')
+    form_class = ReceiptionForm
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status = self.kwargs.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        return queryset
+    def get_context_data(self, **kwargs):
+        # Call the base implementation to get the default context
+        context = super().get_context_data(**kwargs)
+        # Add the form to the context
+        context['form'] = self.form_class()
+        return context
+
+
+
+
 # def course_details(request, course_id):
 #     course = get_object_or_404(Course, id=course_id)
 #     teacher = course.teacher  # Kursga tegishli ustozni olish

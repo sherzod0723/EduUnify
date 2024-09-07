@@ -15,7 +15,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = ['https://edu-unify.uz']
 
 INSTALLED_APPS = [
-    'jazzmin',
+    #'jazzmin',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
