@@ -22,7 +22,17 @@
 </div>
 <div style="margin-top: 15px;" class="card shadow col-12">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="card-title">Barcha qabul</h4>
+        <h4 class="card-title"><button 
+            type="button" 
+            class="btn btn-outline-success btn-my-4"
+            data-bs-toggle="modal" 
+            data-bs-target="#createCourseModal1"
+            data-reception-id="{{ reception.id }}" 
+        >
+           O'quvchi qo'shish
+        </button></h4>
+      
+        
         <div>
             <a class="btn btn-outline-primary" href="{% url 'all-reception' %}">Barcha</a>
             <a class="btn btn-outline-success" href="{% url 'active-reception' %}">Faol</a>
@@ -59,6 +69,9 @@
                         {% endif %}
                     </a>
                 </td>
+
+                <td><a href="{% url 'edit_receiption1' reception.id %}">✏️</a></td>
+
                 <td><button 
     type="button" 
     class="btn btn-outline-success btn-my-4"
@@ -68,6 +81,7 @@
 >
     Tahrirlash
 </button></td>
+
                 <td><button 
             type="button" 
             class="btn btn-outline-success btn-my-4"
@@ -111,12 +125,21 @@
         <h5 class="modal-title" id="createCourseModalLabel">Tahrirlash</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
+     
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm1">
+    {% csrf_token %}
+    {{ form|crispy}}
+
         {% for reception in receptions %}
       <div class="modal-body">
         <!-- Load the course creation form here -->
           <form method="post" id="createCourseForm1" action="{% url 'edit_receiption1' reception.id %}">
     {% csrf_token %}
     {{ form.as_p }}
+
     
     <br>
 
@@ -127,7 +150,9 @@
     </div>
 </form>
           </div>
+
         {% endfor %}
+
           </div>
           </div>
 </div>

@@ -366,6 +366,9 @@ class ReceiptionAdminListView(ListView):
     context_object_name = 'receptions'
     form_class = Aas
 
+    form_class1 = ReceiptionForm
+
+
     def get_queryset(self):
         queryset = super().get_queryset()
         status = self.kwargs.get('status', None)
@@ -378,6 +381,9 @@ class ReceiptionAdminListView(ListView):
         context = super().get_context_data(**kwargs)
         # Add the form to the context
         context['form1'] = self.form_class()
+
+        context['form'] = self.form_class1()
+
         return context
 
 
