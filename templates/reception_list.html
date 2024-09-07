@@ -1,4 +1,5 @@
 {% extends 'boss/base.html' %}
+{% load crispy_forms_tags %}
 {% block title %} Barcha qabul {% endblock title %}
 
 {% block content %}
@@ -21,7 +22,17 @@
 </div>
 <div style="margin-top: 15px;" class="card shadow col-12">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="card-title">Barcha qabul</h4>
+        <h4 class="card-title"><button 
+            type="button" 
+            class="btn btn-outline-success btn-my-4"
+            data-bs-toggle="modal" 
+            data-bs-target="#createCourseModal1"
+            data-reception-id="{{ reception.id }}" 
+        >
+           O'quvchi qo'shish
+        </button></h4>
+      
+        
         <div>
             <a class="btn btn-outline-primary" href="{% url 'all-reception' %}">Barcha</a>
             <a class="btn btn-outline-success" href="{% url 'active-reception' %}">Faol</a>
@@ -59,10 +70,125 @@
                     </a>
                 </td>
                 <td><a href="{% url 'edit_receiption1' reception.id %}">✏️</a></td>
-                <td><a href="{% url 'create-user' reception.id %}">✏️</a></td>
+                <td><button 
+            type="button" 
+            class="btn btn-outline-success btn-my-4"
+            data-bs-toggle="modal"
+            data-bs-target="#createCourseModal"
+        >
+           Username  yaratish
+        </button></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+<div class="modal fade" id="createCourseModal" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createCourseModalLabel">Username  yaratish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm" action="{% url 'create-user' %}">
+    {% csrf_token %}
+     {{ form1|crispy }}
+        <br>
+    <!-- Include other fields similarly -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+    </div>
+</form>
+          </div>
+          </div>
+          </div>
+</div>
+<div class="modal fade" id="createCourseModal1" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createCourseModalLabel">Tahrirlash</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+     
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm1">
+    {% csrf_token %}
+    {{ form|crispy}}
+    
+    <br>
+
+    <!-- Include other fields similarly -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+    </div>
+</form>
+          </div>
+  
+          </div>
+          </div>
+</div>
+
+    
+  
+<script>
+document.querySelectorAll('.btn-my-4').forEach(button => {
+    button.addEventListener('click', function() {
+        const receptionId = this.getAttribute('data-reception-id');  // Get the reception ID from the button
+        
+        // Fetch the form for editing the reception
+        fetch(`/edit_receiption/${receptionId}/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('editReceptionModalBody').innerHTML = html;  // Load the form into the modal body
+                $('#editReceptionModal').modal('show');  // Show the modal
+            })
+            .catch(error => console.log('Error loading modal form:', error));
+    });
+});
+
+document.getElementById('openCreateCourseModal').addEventListener('click', function() {
+    fetch("{% url 'create-user' %}")
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('createCourseModalBody').innerHTML = html;
+        })
+        .catch(error => console.log('Error loading modal form:', error));
+});
+
+
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'createCourseForm') {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Optionally, reload the page or close the modal and update the content dynamically
+                $('#createCourseModal').modal('hide');  // Hide the modal using jQuery
+                location.reload();  // Reload the page to reflect changes
+            } else if (data.errors) {
+                const modalBody = document.getElementById('createCourseModalBody');
+                modalBody.innerHTML = data.html;  // Re-render the form with errors
+            }
+        })
+        .catch(error => console.error('Error submitting form:', error));
+    }
+});
+</script>
+
 {% endblock content %}

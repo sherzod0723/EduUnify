@@ -1,33 +1,59 @@
 {% extends 'boss/base.html' %}
+{% load crispy_forms_tags %}
 {% block title %} Barcha o'quvchilar {% endblock title %}
 
 {% block content %}
-    <style>
-        .yellow {
-    background-color: yellow !important;
-}
 
-.white {
-    background-color: white;
+<style>
+.card {
+    border: none;
+    overflow-x: auto;
 }
-    </style>
+</style>
 <div class="col-12">
     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
         <button 
             type="button" 
-            class="btn btn-lg btn-secondary text-white"   
+            class="btn btn-lg btn-secondary btn-my-4"
+            data-bs-toggle="modal"
+            data-bs-target="#createCourseModal"
         >
-            <a class="text-white" href="{% url 'create-user' %}">O'quvchi yaratish</a>
+           O'quvchi  yaratish
         </button>
-
         <div class="page-title-right">
             <ol class="breadcrumb m-0">
                 <li class="breadcrumb-item"><a href="{% url 'income' %}">Kirim</a></li>
-                <li class="breadcrumb-item active">O'quvchilar</li>
+                <li class="breadcrumb-item active">Barcha kurslar</li>
             </ol>
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="createCourseModal" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createCourseModalLabel">O'quvchi yaratish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Load the course creation form here -->
+          <form method="post" id="createCourseForm" action="{% url 'create-user' %}">
+    {% csrf_token %}
+     {{ form|crispy }}
+        <br>
+    <!-- Include other fields similarly -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+    </div>
+</form>
+          </div>
+          </div>
+          </div>
+</div>
+
 
 <div class="card">
     <div class="card-header">
@@ -62,5 +88,43 @@
         </table>
     </div>
 </div>
+<script>
+document.getElementById('openCreateCourseModal').addEventListener('click', function() {
+    fetch("{% url 'create-user' %}")
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('createCourseModalBody').innerHTML = html;
+        })
+        .catch(error => console.log('Error loading modal form:', error));
+});
 
+
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'createCourseForm') {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Optionally, reload the page or close the modal and update the content dynamically
+                $('#createCourseModal').modal('hide');  // Hide the modal using jQuery
+                location.reload();  // Reload the page to reflect changes
+            } else if (data.errors) {
+                const modalBody = document.getElementById('createCourseModalBody');
+                modalBody.innerHTML = data.html;  // Re-render the form with errors
+            }
+        })
+        .catch(error => console.error('Error submitting form:', error));
+    }
+});
+</script>
 {% endblock content %}
